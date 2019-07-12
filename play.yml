@@ -11,7 +11,33 @@
 
   roles:
     - elasticsearch
-
+    
+- hosts: nodes
+  remote_user: root
+  become: yes
+  vars_prompt:
+     - name: minheap
+       prompt: enter minimum heap
+       private: no
+     - name: maxheap
+       prompt: enter maximum heap
+       private: no
+  tasks:
+    - name: HMS
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: "-Xms1g"
+        line: "-Xms{{ minheap }}g"
+        state: present
+        backup: yes
+   - name: HMX
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: "-Xms1g"
+        line: "-Xms{{ maxheap }}g"
+        state: present
+        backup: yes
+        
 - name: Install Logstash
   hosts: nodes
   remote_user: root
