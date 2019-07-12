@@ -1,0 +1,41 @@
+- name: Install Java Jdk
+  hosts: nodes
+  remote_user: root
+
+  roles:
+    - java
+
+- name: Install Elasticsearch
+  hosts: nodes
+  become: yes
+
+  roles:
+    - elasticsearch
+
+- name: Install Logstash
+  hosts: nodes
+  remote_user: root
+
+  roles:
+    - logstash
+
+- name: Install Kibana
+  hosts: nodes
+  remote_user: root
+
+  roles:
+    - kibana
+
+- name: Install Nginx
+  hosts: nodes
+  remote_user: root
+
+  roles:
+    - nginx
+
+- name: Install Filebeat
+  hosts: nodes
+  remote_user: root
+
+  roles:
+    - filebeat
