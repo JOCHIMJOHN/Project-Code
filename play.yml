@@ -1,0 +1,67 @@
+- name: Install Java Jdk
+  hosts: master
+  remote_user: root
+
+  roles:
+    - java
+
+- name: Install Elasticsearch
+  hosts: master
+  become: yes
+
+  roles:
+    - elasticsearch
+    
+- hosts: master
+  remote_user: root
+  become: yes
+  vars_prompt:
+     - name: minheap
+       prompt: enter minimum heap size in GB
+       private: no
+     - name: maxheap
+       prompt: enter maximum heap size in GB
+       private: no
+  tasks:
+    - name: HMS
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: "-Xms1g"
+        line: "-Xms{{ minheap }}g"
+        state: present
+        backup: yes
+    - name: HMX
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: "-Xms1g"
+        line: "-Xms{{ maxheap }}g"
+        state: present
+        backup: yes
+        
+- name: Install Logstash
+  hosts: master
+  remote_user: root
+
+  roles:
+    - logstash
+
+- name: Install Kibana
+  hosts: master
+  remote_user: root
+
+  roles:
+    - kibana
+
+- name: Install Nginx
+  hosts: master
+  remote_user: root
+
+  roles:
+    - nginx
+
+- name: Install Filebeat
+  hosts: master
+  remote_user: root
+
+  roles:
+    - filebeat
