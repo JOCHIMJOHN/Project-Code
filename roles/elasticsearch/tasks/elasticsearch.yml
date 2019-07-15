@@ -1,0 +1,10 @@
+- name: copy elasticsearch repository
+  copy: 
+      src: elasticsearch.repo
+      dest: /etc/yum.repos.d/elasticsearch.repo
+- name: install the latest version of Elasticsearch
+  yum: name=elasticsearch state=latest
+- name: Copy jvm file to Elasticsearch
+  copy:
+      src: jvm.options
+      dest: /etc/elasticsearch/jvm.options 

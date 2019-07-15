@@ -1,0 +1,7 @@
+- name: Install Filebeat
+  yum: name=filebeat state=present
+- name: Restart Filebeat
+  service:
+    name: filebeat
+    state: restarted
+    enabled: yes

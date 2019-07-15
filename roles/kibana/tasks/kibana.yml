@@ -1,0 +1,11 @@
+- name: install the latest version of Kibana
+  yum: name=kibana state=latest
+- name: copy kibana configuration file
+  copy:
+      src: kibana.yml
+      dest: /etc/kibana/kibana.yml
+- name: Restart kibana
+  service:
+    name: kibana
+    state: restarted
+    enabled: yes

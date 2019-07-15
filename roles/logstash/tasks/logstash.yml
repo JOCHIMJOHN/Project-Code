@@ -1,0 +1,13 @@
+- name: Restart elasticsearch
+  service:
+    name: elasticsearch
+    state: restarted
+    enabled: yes
+- name: Install the latest version of logstash
+  yum: name=logstash state=present 
+- name: Restart Logstash
+  service:
+    name: logstash
+    state: restarted
+    enabled: yes
+
