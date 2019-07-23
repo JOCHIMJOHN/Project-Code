@@ -1,0 +1,80 @@
+- name: Planning Elk Cluster
+  hosts: localhost 
+  vars_files:
+   - creds.yml
+  vars_prompt:
+     - name: cluster
+       prompt: Enter cluster name
+       private: no
+     - name: mcount
+       prompt: Enter number of master node
+       private: no
+     - name: dcount
+       prompt: Enter number of data nodes
+       private: no
+     - name: mclass
+       prompt: Enter instance class for master node (t3a.medium and above)
+       private: no
+     - name: dclass
+       prompt: Enter instance class for data node (t3a.medium and above)
+       private: no
+  tasks:
+    - name: Creating master instances
+      ec2:
+         instance_type: "{{ mclass }}"
+         image: "{{ img }}"
+         keypair: "{{ kpair }}"
+         group_id: "{{ gp_id }}"
+         count: "{{ mcount }}"
+         aws_access_key: "{{ ec2_access_key }}"
+         aws_secret_key: "{{ ec2_secret_key }}"
+         region: "{{ rg }}"
+         instance_tags:
+           Type: master
+         wait: yes
+         termination_protection: no
+      register: ec2_master
+    - name: Creting data instances
+      ec2:
+         instance_type: "{{ dclass }}"
+         image: "{{ img }}"
+         keypair: "{{ kpair }}"
+         group_id: "{{ gp_id }}"
+         count: "{{ dcount }}"
+         aws_access_key: "{{ ec2_access_key }}"
+         aws_secret_key: "{{ ec2_secret_key }}"
+         region: "{{ rg }}"
+         instance_tags:
+           Type: data
+         wait: yes
+         termination_protection: no
+      register: ec2_data
+    - name: Creating host file
+      file:
+        path: /home/server/elk/{{ cluster }}
+        state: touch
+    - name: Creating hostgroups
+      lineinfile:
+        path: /home/server/elk/{{ cluster }}
+        regexp: "master"
+        line: "[master]"
+    - name: Creating hostgroups
+      lineinfile:
+        path: /home/server/elk/{{ cluster }}
+        regexp: "data"
+        line: "[data]" 
+    - name: Adding hosts to inventory
+      lineinfile:
+        path: /home/server/elk/{{ cluster }}
+        line: "{{ item.private_ip }}"
+        insertafter: "[master]"
+        firstmatch: yes
+        state: present
+      with_items: "{{ ec2_master.instances }}"
+    - name: Adding hosts to inventory
+      lineinfile:
+        path: /home/server/elk/{{ cluster }}
+        line: "{{ item.private_ip }}"
+        insertafter: "[data]"
+        state: present
+      with_items: "{{ ec2_data.instances }}"
